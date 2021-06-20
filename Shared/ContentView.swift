@@ -16,7 +16,7 @@ struct ContentView: View {
     @State var planet: [Planet] = []
     @State var planet_offline:[Planet] = []
     var body: some View {
-        // Displaying the list making an api call.
+        // Displaying the list making an api call when connected to internet.
         if monitor.isConnected {
             List(planet) { item in
                 Text(item.name)
