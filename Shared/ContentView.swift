@@ -12,33 +12,45 @@ struct ContentView: View {
     // Instance variable of the class network monitor.
     @ObservedObject var monitor = NetworkMonitor()
     
+    let defaults = UserDefaults.standard
+    
     // Global variables.
     @State var planet: [Planet] = []
     @State var planet_offline:[Planet] = []
     var body: some View {
-        // Displaying the list making an api call when connected to internet.
-        if monitor.isConnected {
-            List(planet) { item in
-                Text(item.name)
-            }
-            .onAppear{
-                Api().getPlanets { planet in
+        
+        List(planet) { item in
+            Text(item.name)
+        }
+        .onAppear{
+            // Displaying the list making an api call when connected to internet.
+            if monitor.isConnected {
+                Api().getPlanets{ planet in
                     self.planet = planet
-                    // Assigning to local variable but this will reset when the app is terminated.
-                    // ToDo use key-value pair equivalent in swift which stores the (encoded) list locally which can be used to display in offline mode.
-                    self.planet_offline = planet
                 }
             }
-        }
-        // Displaying the list when offline.
-        else {
-            // ToDo: Decode the locally stored list from the key-value pair.
-            // Assign it to the variable when in offline and pass it on to the list ui element.
-            // For now a local variable is used to store the value but the value of this variable resets when the app is terminated.
-            List(planet_offline) { item in
-                Text(item.name)
+            // Displaying the offline list stored locally.
+            else {
+                self.planet = retrieveOffline()
             }
         }
+    }
+    
+    // Function to save the list locally.
+    func saveOffline(planet: [Planet]) {
+        
+        // Encode the values before storing in userdefaults.
+        let encoded = try? JSONEncoder().encode(planet)
+        defaults.setValue(encoded, forKey: "OfflineList")
+    }
+    
+    // Function to retrieve the locally saved list.
+    func retrieveOffline() -> [Planet] {
+        if let savedList = defaults.object(forKey: "OfflineList") as? Data,
+           let loadedList = try? JSONDecoder().decode([Planet].self, from: savedList){
+                self.planet_offline = loadedList
+            }
+        return self.planet_offline
     }
 }
 
