@@ -46,6 +46,7 @@ struct ContentView: View {
     
     // Function to retrieve the locally saved list.
     func retrieveOffline() -> [Planet] {
+        // Retrieve the stored values and decode them to the [Planet] type.
         if let savedList = defaults.object(forKey: "OfflineList") as? Data,
            let loadedList = try? JSONDecoder().decode([Planet].self, from: savedList){
                 self.planet_offline = loadedList

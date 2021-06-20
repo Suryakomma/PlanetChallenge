@@ -19,6 +19,7 @@ class NetworkMonitor: ObservableObject {
         monitor.pathUpdateHandler = { path in
             // As we are using the published variable to alter the UI elements , we are going to execute it on main thread.
             DispatchQueue.main.async {
+                // Checking if the network status is satisfied (connected) to set the value to true.
                 self.isConnected = path.status == .satisfied ? true : false
             }
         }
